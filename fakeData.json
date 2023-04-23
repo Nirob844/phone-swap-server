@@ -1,0 +1,35 @@
+[
+    {
+        "name": "Apple 13 pro",
+        "seller": "Nirob Hasan",
+        "category": "Apple",
+        "condition": "good",
+        "used": "2 years",
+        "resale Price": "80$",
+        "original Price": "100$",
+        "location": "Dhaka",
+        "date": "4/5/23"
+    },
+    {
+        "name": "Note 9 Pro",
+        "seller": "Alip Hasan",
+        "category": "Xiaomi",
+        "condition": "good",
+        "used": "2 years",
+        "resale Price": "80$",
+        "original Price": "100$",
+        "location": "Dhaka",
+        "date": "4/5/23"
+    },
+    {
+        "name": "Realmi 8 Pro",
+        "seller": "Nasir kha",
+        "category": "Realmi",
+        "condition": "good",
+        "used": "2 years",
+        "resale Price": "80$",
+        "original Price": "100$",
+        "location": "Dhaka",
+        "date": "4/5/23"
+    }
+]

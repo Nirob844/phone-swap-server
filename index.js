@@ -13,8 +13,31 @@ app.use(cors());
 app.use(express.json());
 
 
+const uri = `mongodb+srv://${process.env.BD_USER}:${process.env.DB_PASSWORD}@cluster0.9mv6kq4.mongodb.net/?retryWrites=true&w=majority`;
+const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 
 
+async function run() {
+    try {
+        const productsCollection = client.db('phoneSwap').collection('products');
+        const categoryCollection = client.db('phoneSwap').collection('category');
+
+        app.get('/products', async (req, res) => {
+            const query = {}
+            const cursor = productsCollection.find(query);
+            const products = await cursor.toArray();
+            res.send(products);
+        });
+
+
+    }
+    finally {
+
+    }
+
+}
+
+run().catch(err => console.error(err));
 
 
 app.get('/', (req, res) => {
