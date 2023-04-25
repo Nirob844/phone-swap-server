@@ -21,6 +21,7 @@ async function run() {
     try {
         const productsCollection = client.db('phoneSwap').collection('products');
         const categoryCollection = client.db('phoneSwap').collection('category');
+        const usersCollection = client.db('phoneSwap').collection('user');
 
         app.get('/products', async (req, res) => {
             const query = {}
@@ -40,6 +41,19 @@ async function run() {
             const selectCategory = { category: category };
             const products = await productsCollection.find(selectCategory).toArray();
             res.send(products);
+        });
+
+        app.post('/users', async (req, res) => {
+            const user = req.body;
+            console.log(user);
+            const result = await usersCollection.insertOne(user);
+            res.send(result);
+        });
+
+        app.get('/users', async (req, res) => {
+            const query = {};
+            const users = await usersCollection.find(query).toArray();
+            res.send(users);
         });
 
     }
