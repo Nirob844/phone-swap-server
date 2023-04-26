@@ -51,6 +51,16 @@ async function run() {
             }
             next();
         }
+        const verifySeller = async (req, res, next) => {
+            const decodedEmail = req.decoded.email;
+            const query = { email: decodedEmail };
+            const user = await usersCollection.findOne(query);
+
+            if (user?.role !== 'Seller') {
+                return res.status(403).send({ message: 'forbidden access' })
+            }
+            next();
+        }
 
         app.get("/jwt", async (req, res) => {
             const email = req.query.email;
@@ -87,7 +97,6 @@ async function run() {
 
         app.post('/users', async (req, res) => {
             const user = req.body;
-            console.log(user);
             const result = await usersCollection.insertOne(user);
             res.send(result);
         });
@@ -125,6 +134,21 @@ async function run() {
             const result = await usersCollection.updateOne(filter, updatedDoc, options);
             res.send(result);
         });
+
+        app.delete("/users/:id", verifyJWT, verifyAdmin, async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: new ObjectId(id) };
+            const result = await usersCollection.deleteOne(filter);
+            res.send(result);
+        });
+
+        app.get("/users/seller/:email", async (req, res) => {
+            const email = req.params.email;
+            const query = { email };
+            const user = await usersCollection.findOne(query);
+            res.send({ isSeller: user?.role === "Seller" });
+        });
+
     }
     finally {
 
