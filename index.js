@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-//const jwt = require('jsonwebtoken');
+const jwt = require('jsonwebtoken');
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 // require('crypto').randomBytes(64).toString('hex')
 require('dotenv').config();
@@ -16,12 +16,43 @@ app.use(express.json());
 const uri = `mongodb+srv://${process.env.BD_USER}:${process.env.DB_PASSWORD}@cluster0.9mv6kq4.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 
+function verifyJWT(req, res, next) {
+
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+        return res.status(401).send('unauthorized access');
+    }
+
+    const token = authHeader.split(' ')[1];
+
+    jwt.verify(token, process.env.ACCESS_TOKEN, function (err, decoded) {
+        if (err) {
+            return res.status(403).send({ message: 'forbidden access' })
+        }
+        req.decoded = decoded;
+        next();
+    })
+
+}
+
 
 async function run() {
     try {
         const productsCollection = client.db('phoneSwap').collection('products');
-        const categoryCollection = client.db('phoneSwap').collection('category');
         const usersCollection = client.db('phoneSwap').collection('user');
+
+        app.get("/jwt", async (req, res) => {
+            const email = req.query.email;
+            const query = { email: email };
+            const user = await usersCollection.findOne(query);
+            if (user) {
+                const token = jwt.sign({ email }, process.env.ACCESS_TOKEN, {
+                    expiresIn: "1d",
+                });
+                return res.send({ accessToken: token });
+            }
+            res.status(403).send({ accessToken: "" });
+        });
 
         app.get('/products', async (req, res) => {
             const query = {}
