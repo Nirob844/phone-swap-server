@@ -82,6 +82,12 @@ async function run() {
             res.send(products);
         });
 
+        app.post("/product", verifyJWT, verifySeller, async (req, res) => {
+            const product = req.body;
+            const result = await productsCollection.insertOne(product);
+            res.send({ ...result, ...req.body });
+        });
+
         app.get('/products/all-category', async (req, res) => {
             const query = {}
             const result = await productsCollection.find(query).project({ category: 2 }).toArray();
@@ -97,6 +103,12 @@ async function run() {
 
         app.post('/users', async (req, res) => {
             const user = req.body;
+            const query = { email: user.email };
+            const alreadyExist = await usersCollection.findOne(query);
+            if (alreadyExist) {
+                res.send(JSON.stringify({ message: "User already exists" }));
+                return;
+            }
             const result = await usersCollection.insertOne(user);
             res.send(result);
         });
