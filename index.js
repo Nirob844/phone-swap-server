@@ -40,6 +40,7 @@ async function run() {
     try {
         const productsCollection = client.db('phoneSwap').collection('products');
         const usersCollection = client.db('phoneSwap').collection('user');
+        const bookingCollection = client.db('phoneSwap').collection('booking');
 
         const verifyAdmin = async (req, res, next) => {
             const decodedEmail = req.decoded.email;
@@ -75,6 +76,7 @@ async function run() {
             res.status(403).send({ accessToken: "" });
         });
 
+        //products
         app.get('/products', async (req, res) => {
             const query = {}
             const cursor = productsCollection.find(query);
@@ -101,6 +103,7 @@ async function run() {
             res.send(products);
         });
 
+        //user
         app.post('/users', async (req, res) => {
             const user = req.body;
             const query = { email: user.email };
@@ -160,6 +163,34 @@ async function run() {
             const user = await usersCollection.findOne(query);
             res.send({ isSeller: user?.role === "Seller" });
         });
+
+        //booking
+
+        app.post("/bookings", async (req, res) => {
+            const booking = req.body;
+            const result = await bookingCollection.insertOne(booking);
+            res.send(result);
+        });
+
+        app.get("/bookings", async (req, res) => {
+            let query = {};
+            if (req.query.email) {
+                query = {
+                    email: req.query.email,
+                };
+            }
+            const cursor = bookingCollection.find(query);
+            const orders = await cursor.toArray();
+            res.send(orders);
+        });
+
+        app.get("/bookings/:id", async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const result = await bookingCollection.findOne(query);
+            res.send(result);
+        });
+
 
     }
     finally {
