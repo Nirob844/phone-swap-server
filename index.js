@@ -103,6 +103,18 @@ async function run() {
             res.send(products);
         });
 
+        app.get("/product", async (req, res) => {
+            let query = {};
+            if (req.query.email) {
+                query = {
+                    email: req.query.email,
+                };
+            }
+            const cursor = productsCollection.find(query);
+            const orders = await cursor.toArray();
+            res.send(orders);
+        });
+
         //user
         app.post('/users', async (req, res) => {
             const user = req.body;
@@ -191,6 +203,31 @@ async function run() {
             res.send(result);
         });
 
+        //advertise
+
+        app.patch("/product-advertise/:id", verifyJWT, async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: new ObjectId(id) };
+            const options = { upsert: true };
+            const updateDoc = {
+                $set: {
+                    status: "promoted",
+                },
+            };
+            const result = await productsCollection.updateOne(
+                filter,
+                updateDoc,
+                options
+            );
+            res.send(result);
+        });
+
+        app.delete("/product-delete/:id", verifyJWT, async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: new ObjectId(id) };
+            const result = await productsCollection.deleteOne(filter);
+            res.send(result);
+        });
 
     }
     finally {
