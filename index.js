@@ -205,10 +205,11 @@ async function run() {
 
         //advertise
 
-        app.patch("/product-advertise/:id", verifyJWT, async (req, res) => {
+        app.put('/product-advertise/:id', verifyJWT, async (req, res) => {
             const id = req.params.id;
+            console.log(id);
             const filter = { _id: new ObjectId(id) };
-            const options = { upsert: true };
+            const options = { upset: true };
             const updateDoc = {
                 $set: {
                     status: "promoted",
